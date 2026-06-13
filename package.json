@@ -2,6 +2,16 @@
   "name": "pc-interview",
   "private": true,
   "workspaces": ["packages/*"],
+  "scripts": {
+    "dev:api": "cd packages/api && bun run dev",
+    "dev:web": "cd packages/web && bun run dev",
+    "test:shared": "cd packages/shared && bun run test",
+    "test:api": "cd packages/api && bun run test",
+    "test:e2e": "cd packages/web && bun run test:e2e",
+    "db:generate": "cd packages/api && bun run db:generate",
+    "db:migrate": "cd packages/api && bun run db:migrate",
+    "db:seed": "cd packages/api && bun run db:seed"
+  },
   "devDependencies": {
     "pc-interview": ".",
     "typescript": "^6.0.3"

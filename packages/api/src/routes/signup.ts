@@ -3,7 +3,8 @@ import { db, schema } from "../db/index.ts";
 
 const signup: FastifyPluginAsync = async (fastify) => {
   fastify.post("/api/signup", async (request, reply) => {
-    const { name } = request.body as { name?: string };
+    const body = request.body as Record<string, unknown> | undefined;
+    const name = body?.name as string | undefined;
 
     const id = crypto.randomUUID();
     await db.insert(schema.users).values({ id, name: name ?? null });
