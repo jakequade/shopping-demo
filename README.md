@@ -89,7 +89,7 @@ cd packages/web && bun run test:e2e
 ## Design decisions
 
 - **Prices as integer cents** — avoids float precision issues. See `docs/adr/0001-store-prices-as-integer-cents.md`.
-- **`x-user-id` header** — minimal auth swap-in; in production this would be a JWT or session cookie.
+- **`x-user-id` header** — minimal auth swap-in for development. The "log out" button only clears `localStorage`; a production version would use proper authentication (JWT / session cookie) with server-side session invalidation.
 - **No `carts` table** — cart items are keyed directly by `user_id`. A `carts` table would be needed for cart-wide state (discounts, status).
 - **Autoload for Fastify** — plugins and routes are auto-discovered by directory structure.
 - **fastify-plugin** — used to break Fastify encapsulation so the `x-user-id` hook applies to all routes.

@@ -46,6 +46,14 @@ export function CartView() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("userId");
+    setUserId(null);
+    setCart(null);
+    setError(null);
+    window.dispatchEvent(new CustomEvent("cart-updated"));
+  };
+
   if (!userId) {
     return (
       <div className="card bg-base-100">
@@ -61,7 +69,10 @@ export function CartView() {
     return (
       <div className="card bg-base-100">
         <div className="card-body p-4">
-          <h2 className="card-title">Your Cart</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="card-title">Your Cart</h2>
+            <button onClick={handleLogout} className="btn btn-ghost btn-xs">Log out</button>
+          </div>
           <p className="text-error">{error}</p>
         </div>
       </div>
@@ -73,7 +84,10 @@ export function CartView() {
   return (
     <div className="card bg-base-100">
       <div className="card-body p-4">
-        <h2 className="card-title">Your Cart</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="card-title">Your Cart</h2>
+          <button onClick={handleLogout} className="btn btn-ghost btn-xs">Log out</button>
+        </div>
         {cart.items.length === 0 ? (
           <p>Cart is empty.</p>
         ) : (
