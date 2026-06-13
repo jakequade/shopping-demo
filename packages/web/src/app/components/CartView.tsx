@@ -2,11 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Cart, formatPrice } from "@pc/shared";
-
-const API_ORIGIN =
-  typeof window !== "undefined"
-    ? process.env.NEXT_PUBLIC_API_ORIGIN ?? "http://localhost:3001"
-    : "http://localhost:3001";
+import { getCart, removeFromCart, signup } from "../actions";
 
 export function CartView() {
   const [cart, setCart] = useState<Cart | null>(null);
@@ -20,18 +16,11 @@ export function CartView() {
 
   const refreshCart = async (uid: string) => {
     try {
-      const res = await fetch(`${API_ORIGIN}/api/cart`, {
-        headers: { "x-user-id": uid },
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        setError(err.message ?? "Failed to load cart");
-        return;
-      }
-      setCart(await res.json());
+      const cart = await getCart(uid);
+      setCart(Cart.parse(cart));
       setError(null);
-    } catch {
-      setError("Failed to load cart");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load cart");
     }
   };
 
@@ -49,22 +38,11 @@ export function CartView() {
   const handleRemove = async (productId: string) => {
     if (!userId) return;
     try {
-      const res = await fetch(
-        `${API_ORIGIN}/api/cart?productId=${productId}`,
-        {
-          method: "DELETE",
-          headers: { "x-user-id": userId },
-        },
-      );
-      if (!res.ok) {
-        const err = await res.json();
-        setError(err.message ?? "Failed to remove item");
-        return;
-      }
+      await removeFromCart(productId, userId);
       setError(null);
       await refreshCart(userId);
-    } catch {
-      setError("Failed to remove item");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to remove item");
     }
   };
 
@@ -138,7 +116,7 @@ export function CartView() {
   );
 }
 
-function SignupForm({ onSignup }: { onSignup: (id: string) => void }) {
+function SignupForm({ onSignup: onSignupCb }: { onSignup: (id: string) => void }) {
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -146,21 +124,11 @@ function SignupForm({ onSignup }: { onSignup: (id: string) => void }) {
     e.preventDefault();
     setError(null);
     try {
-      const res = await fetch(`${API_ORIGIN}/api/signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name || undefined }),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        setError(err.message ?? "Signup failed");
-        return;
-      }
-      const data = await res.json();
+      const data = await signup(name || undefined);
       localStorage.setItem("userId", data.userId);
-      onSignup(data.userId);
-    } catch {
-      setError("Signup failed");
+      onSignupCb(data.userId);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Signup failed");
     }
   };
 
