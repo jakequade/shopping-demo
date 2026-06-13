@@ -1,0 +1,9 @@
+{
+  "name": "pc-interview",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "devDependencies": {
+    "pc-interview": ".",
+    "typescript": "^6.0.3"
+  }
+}

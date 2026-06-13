@@ -10,7 +10,7 @@ Last updated: 2026-06-13
 
 | #  | Slice                            | Status      | Notes                       |
 |----|----------------------------------|-------------|-----------------------------|
-| 01 | Monorepo + DB scaffold           | todo        | bun workspaces, shared Zod schemas (Product, CartItem, Cart, ApiError), Docker Compose (Postgres 16), Drizzle config + migrations (users, products, cart_items) |
+| 01 | Monorepo + DB scaffold           | done        | bun workspaces, shared Zod schemas (Product, CartItem, Cart, ApiError), Docker Compose (Postgres 16), Drizzle config + migrations (users, products, cart_items) |
 | 02 | Products seed + API + list page  | todo        | Seed 6-10 products across 3+ categories, GET /api/products, Next.js RSC product list page, "Add to cart" button (wired but needs signup) |
 | 03 | Signup + user identity plumbing  | todo        | POST /api/signup, Fastify x-user-id hook, client-side localStorage provider |
 | 04 | Cart API                         | todo        | GET/POST/DELETE /api/cart/items, line subtotals + grand total, validation (unknown product → 4xx + ApiError, non-positive qty → 4xx) |
