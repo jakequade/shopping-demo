@@ -15,7 +15,11 @@ export function AddToCartButton({ productId }: { productId: string }) {
 
   const fetchCartQuantity = useCallback(async () => {
     const uid = localStorage.getItem("userId");
-    if (!uid) return;
+    if (!uid) {
+      setQuantity(null);
+      setInputValue("");
+      return;
+    }
     try {
       const cart = await getCart(uid);
       const item = cart.items.find((i) => i.product.id === productId);
