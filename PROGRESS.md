@@ -16,7 +16,7 @@ Last updated: 2026-06-13
 | 04 | Cart API                         | done        | GET/POST/DELETE /api/cart/items, line subtotals + grand total, validation (unknown product → 4xx + ApiError, non-positive qty → 4xx) |
 | 05 | Cart UI                          | done        | Cart client component, Server Actions, add/remove, totals, error surfacing |
 | 06 | Tests                            | done        | Vitest unit + integration (schemas, API routes), Playwright e2e (full chain), README |
-| 07 | DaisyUI scaffold                 | todo        | Install Tailwind CSS v4 + @tailwindcss/postcss + DaisyUI v5, wire globals.css, set data-theme="lofi", verify dev server |
+| 07 | DaisyUI scaffold                 | done        | Install Tailwind CSS v4 + @tailwindcss/postcss + DaisyUI v5, wire globals.css, set data-theme="lofi", verify dev server |
 | 08 | Layout + sidebar cart            | todo        | DaisyUI drawer layout: products left, cart sidebar right (desktop), drawer overlay (mobile). Convert CartView to DaisyUI card + table |
 | 09 | Full component polish            | todo        | DaisyUI card for products, btn for buttons, input/card for signup, navbar with title + cart badge count |
 
