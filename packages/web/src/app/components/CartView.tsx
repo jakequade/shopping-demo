@@ -49,10 +49,13 @@ export function CartView() {
   const handleRemove = async (productId: string) => {
     if (!userId) return;
     try {
-      const res = await fetch(`${API_ORIGIN}/api/cart?productId=${productId}`, {
-        method: "DELETE",
-        headers: { "x-user-id": userId },
-      });
+      const res = await fetch(
+        `${API_ORIGIN}/api/cart?productId=${productId}`,
+        {
+          method: "DELETE",
+          headers: { "x-user-id": userId },
+        },
+      );
       if (!res.ok) {
         const err = await res.json();
         setError(err.message ?? "Failed to remove item");
@@ -67,82 +70,71 @@ export function CartView() {
 
   if (!userId) {
     return (
-      <section>
-        <h2 style={{ fontSize: "1.25rem", fontWeight: 600, marginBottom: "0.75rem" }}>
-          Your Cart
-        </h2>
-        <SignupForm onSignup={(id) => setUserId(id)} />
-      </section>
+      <div className="card bg-base-100">
+        <div className="card-body p-4">
+          <h2 className="card-title">Your Cart</h2>
+          <SignupForm onSignup={(id) => setUserId(id)} />
+        </div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <section>
-        <h2 style={{ fontSize: "1.25rem", fontWeight: 600, marginBottom: "0.75rem" }}>
-          Your Cart
-        </h2>
-        <p style={{ color: "#dc2626" }}>{error}</p>
-      </section>
+      <div className="card bg-base-100">
+        <div className="card-body p-4">
+          <h2 className="card-title">Your Cart</h2>
+          <p className="text-error">{error}</p>
+        </div>
+      </div>
     );
   }
 
-  if (!cart) return <p>Loading cart...</p>;
+  if (!cart) return <p className="p-4 text-base-content/70">Loading cart...</p>;
 
   return (
-    <section>
-      <h2 style={{ fontSize: "1.25rem", fontWeight: 600, marginBottom: "0.75rem" }}>
-        Your Cart
-      </h2>
-      {cart.items.length === 0 ? (
-        <p>Cart is empty.</p>
-      ) : (
-        <>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ textAlign: "left", borderBottom: "2px solid #ddd" }}>
-                <th style={{ padding: 8 }}>Product</th>
-                <th style={{ padding: 8 }}>Qty</th>
-                <th style={{ padding: 8 }}>Subtotal</th>
-                <th style={{ padding: 8 }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {cart.items.map((item) => (
-                <tr key={item.product.id} style={{ borderBottom: "1px solid #eee" }}>
-                  <td style={{ padding: 8 }}>{item.product.name}</td>
-                  <td style={{ padding: 8 }}>{item.quantity}</td>
-                  <td style={{ padding: 8 }}>{formatPrice(item.subtotal)}</td>
-                  <td style={{ padding: 8 }}>
-                    <button
-                      type="button"
-                      onClick={() => handleRemove(item.product.id)}
-                      style={{
-                        color: "#dc2626",
-                        border: "none",
-                        background: "none",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </td>
+    <div className="card bg-base-100">
+      <div className="card-body p-4">
+        <h2 className="card-title">Your Cart</h2>
+        {cart.items.length === 0 ? (
+          <p>Cart is empty.</p>
+        ) : (
+          <>
+            <table className="table table-zebra table-sm">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Subtotal</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <div
-            style={{
-              fontWeight: 700,
-              fontSize: "1.125rem",
-              marginTop: "1rem",
-            }}
-          >
-            Total: {formatPrice(cart.grandTotal)}
-          </div>
-        </>
-      )}
-    </section>
+              </thead>
+              <tbody>
+                {cart.items.map((item) => (
+                  <tr key={item.product.id}>
+                    <td>{item.product.name}</td>
+                    <td>{item.quantity}</td>
+                    <td>{formatPrice(item.subtotal)}</td>
+                    <td>
+                      <button
+                        type="button"
+                        onClick={() => handleRemove(item.product.id)}
+                        className="btn btn-ghost btn-xs text-error"
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="font-bold text-lg mt-2">
+              Total: {formatPrice(cart.grandTotal)}
+            </p>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -173,33 +165,22 @@ function SignupForm({ onSignup }: { onSignup: (id: string) => void }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginTop: "0.5rem" }}>
-      {error && <p style={{ color: "#dc2626", marginBottom: 8 }}>{error}</p>}
-      <p style={{ marginBottom: 8, color: "#666" }}>Sign in to start shopping</p>
-      <input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Your name (optional)"
-        style={{
-          padding: "0.4rem 0.75rem",
-          border: "1px solid #ccc",
-          borderRadius: 6,
-          marginRight: 8,
-        }}
-      />
-      <button
-        type="submit"
-        style={{
-          padding: "0.4rem 1rem",
-          background: "#16a34a",
-          color: "#fff",
-          border: "none",
-          borderRadius: 6,
-          cursor: "pointer",
-        }}
-      >
-        Sign in
-      </button>
+    <form onSubmit={handleSubmit}>
+      {error && <p className="text-error text-sm mb-2">{error}</p>}
+      <p className="text-sm text-base-content/60 mb-2">
+        Sign in to start shopping
+      </p>
+      <div className="flex gap-2">
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Your name (optional)"
+          className="input input-bordered input-sm flex-1"
+        />
+        <button type="submit" className="btn btn-primary btn-sm">
+          Sign in
+        </button>
+      </div>
     </form>
   );
 }

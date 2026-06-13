@@ -1,6 +1,5 @@
 import { Product } from "@pc/shared";
 import { AddToCartButton } from "./components/AddToCartButton";
-import { CartView } from "./components/CartView";
 
 const API_ORIGIN = process.env.API_ORIGIN ?? "http://localhost:3001";
 
@@ -19,15 +18,9 @@ export default async function HomePage() {
   }
 
   return (
-    <main style={{ maxWidth: 960, margin: "0 auto", padding: "2rem 1rem" }}>
-      <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "1rem" }}>
-        Pet Circle
-      </h1>
-
+    <div style={{ maxWidth: 960, margin: "0 auto" }}>
       <section>
-        <h2 style={{ fontSize: "1.25rem", fontWeight: 600, marginBottom: "0.75rem" }}>
-          Products
-        </h2>
+        <h2 className="text-lg font-semibold mb-3">Products</h2>
         {products.length === 0 && <p>No products available.</p>}
         <div
           style={{
@@ -41,11 +34,7 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
-
-      <hr style={{ margin: "2rem 0" }} />
-
-      <CartView />
-    </main>
+    </div>
   );
 }
 

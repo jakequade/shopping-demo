@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { CartDrawer } from "./components/CartDrawer";
 
 export const metadata: Metadata = {
   title: "Pet Circle — Shop",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" data-theme="lofi">
-      <body>{children}</body>
+      <body>
+        <CartDrawer>{children}</CartDrawer>
+      </body>
     </html>
   );
 }
