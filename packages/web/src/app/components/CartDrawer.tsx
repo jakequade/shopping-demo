@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react";
 import { CartView } from "./CartView";
+import { CartBadge } from "./CartBadge";
 
 export function CartDrawer({ children }: { children: ReactNode }) {
   return (
@@ -15,9 +16,10 @@ export function CartDrawer({ children }: { children: ReactNode }) {
           <div className="flex-none lg:hidden">
             <label
               htmlFor="cart-drawer"
-              className="btn btn-square btn-ghost"
+              className="btn btn-square btn-ghost relative"
               aria-label="Open cart"
             >
+              <CartBadge />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"

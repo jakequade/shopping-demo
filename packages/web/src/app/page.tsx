@@ -41,22 +41,13 @@ export default async function HomePage() {
 function ProductCard({ product }: { product: Product }) {
   const dollars = (product.price / 100).toFixed(2);
   return (
-    <div
-      style={{
-        border: "1px solid #ddd",
-        borderRadius: 8,
-        padding: "1rem",
-        background: "#fff",
-      }}
-    >
-      <div style={{ fontWeight: 600 }}>{product.name}</div>
-      <div style={{ color: "#666", fontSize: "0.875rem", marginTop: 4 }}>
-        {product.category}
+    <div className="card bg-base-100 border border-base-200">
+      <div className="card-body p-4">
+        <h3 className="card-title">{product.name}</h3>
+        <p className="text-sm text-base-content/70">{product.category}</p>
+        <p className="text-lg font-bold">${dollars}</p>
+        <AddToCartButton productId={product.id} />
       </div>
-      <div style={{ fontSize: "1.125rem", fontWeight: 700, marginTop: 8 }}>
-        ${dollars}
-      </div>
-      <AddToCartButton productId={product.id} />
     </div>
   );
 }

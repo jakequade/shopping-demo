@@ -52,23 +52,11 @@ export function AddToCartButton({ productId }: { productId: string }) {
         type="button"
         onClick={handleClick}
         disabled={loading}
-        style={{
-          marginTop: 8,
-          padding: "0.5rem 1rem",
-          background: loading ? "#93c5fd" : "#2563eb",
-          color: "#fff",
-          border: "none",
-          borderRadius: 6,
-          cursor: loading ? "not-allowed" : "pointer",
-        }}
+        className={`btn btn-primary btn-sm ${loading ? "btn-disabled" : ""}`}
       >
         {loading ? "Adding..." : "Add to cart"}
       </button>
-      {error && (
-        <p style={{ color: "#dc2626", fontSize: "0.8rem", marginTop: 4 }}>
-          {error}
-        </p>
-      )}
+      {error && <p className="text-error text-xs mt-1">{error}</p>}
     </div>
   );
 }
