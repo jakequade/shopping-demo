@@ -5,6 +5,7 @@ import {
   text,
   integer,
   timestamp,
+  unique,
 } from "drizzle-orm/pg-core";
 
 export const categoryEnum = pgEnum("category", [
@@ -28,13 +29,17 @@ export const products = pgTable("products", {
   category: categoryEnum("category").notNull(),
 });
 
-export const cartItems = pgTable("cart_items", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id),
-  productId: uuid("product_id")
-    .notNull()
-    .references(() => products.id),
-  quantity: integer("quantity").notNull(),
-});
+export const cartItems = pgTable(
+  "cart_items",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id),
+    quantity: integer("quantity").notNull(),
+  },
+  (table) => [unique().on(table.userId, table.productId)],
+);

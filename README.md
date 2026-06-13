@@ -48,8 +48,8 @@ packages/
     src/
       app.ts       Server entry point
       db/          Drizzle schema, client, seed data
-      plugins/     Fastify plugins (user-identity hook)
-      routes/      API route handlers (products, cart, signup)
+      plugins/     Fastify plugins (user-identity, rate-limiter)
+      routes/      API route handlers (products, cart, signup, health)
     drizzle/       Migration files
   web/             Next.js frontend
     src/
@@ -61,13 +61,15 @@ packages/
 
 ## API endpoints
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | /api/products | List all products |
-| POST | /api/signup | Create a user, returns `{ userId }` |
-| GET | /api/cart | Get cart with line items, subtotals, grand total |
-| POST | /api/cart | Add product to cart (increment if exists) |
-| DELETE | /api/cart?productId= | Remove a line item from cart |
+| Method | Path | Description | Rate limit |
+|--------|------|-------------|------------|
+| GET | /api/health | Health check (no auth) | None |
+| GET | /api/products | List all products | 100/min per IP |
+| POST | /api/signup | Create a user, returns `{ userId }` | 10/min per IP |
+| GET | /api/cart | Get cart with line items, subtotals, grand total | 120/min per user |
+| POST | /api/cart | Add product to cart (increment if exists) | 60/min per user |
+| PUT | /api/cart | Set exact quantity for a line item | 60/min per user |
+| DELETE | /api/cart?productId= | Remove a line item from cart | 60/min per user |
 
 All cart endpoints require the `x-user-id` header (set after signup).
 
@@ -91,3 +93,4 @@ cd packages/web && bun run test:e2e
 - **No `carts` table** — cart items are keyed directly by `user_id`. A `carts` table would be needed for cart-wide state (discounts, status).
 - **Autoload for Fastify** — plugins and routes are auto-discovered by directory structure.
 - **fastify-plugin** — used to break Fastify encapsulation so the `x-user-id` hook applies to all routes.
+- **Rate limiting** — `@fastify/rate-limit` applied globally via a plugin. Keyed by `x-user-id` when present, falling back to IP. Strictest limits on `POST /api/signup` (10/min) to prevent account spam; mutation endpoints capped at 60/min; health check exempted entirely. See `packages/api/src/plugins/rate-limiter.ts`.

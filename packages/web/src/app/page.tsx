@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { Product } from "@pc/shared";
 import { AddToCartButton } from "./components/AddToCartButton";
 
@@ -6,7 +7,7 @@ const API_ORIGIN = process.env.API_ORIGIN ?? "http://localhost:3001";
 async function getProducts(): Promise<Product[]> {
   const res = await fetch(`${API_ORIGIN}/api/products`, { cache: "no-store" });
   if (!res.ok) throw new Error("Failed to fetch products");
-  return res.json();
+  return z.array(Product).parse(await res.json());
 }
 
 export default async function HomePage() {

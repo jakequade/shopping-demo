@@ -16,7 +16,7 @@ export default defineConfig({
       timeout: 15_000,
     },
     {
-      command: "cd .. && npx next dev --port 3000",
+      command: "npx next dev --port 3000",
       port: 3000,
       reuseExistingServer: false,
       timeout: 30_000,

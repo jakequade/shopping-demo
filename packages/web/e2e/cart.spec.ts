@@ -2,6 +2,11 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Shopping cart e2e", () => {
   test("sign up, browse products, add to cart, verify cart", async ({ page }) => {
+    // Intercept cart API calls
+    const cartResponsePromise = page.waitForResponse(
+      (res) => res.url().includes("/api/cart") && res.status() === 200,
+    );
+
     await page.goto("/");
 
     // Should show the products list
@@ -13,23 +18,33 @@ test.describe("Shopping cart e2e", () => {
     await expect(signInButton).toBeVisible();
     await signInButton.click();
 
-    // After sign in, cart should be visible and empty
-    await expect(page.locator("text=Cart is empty")).toBeVisible({ timeout: 5000 });
+    // Wait for the cart API call after signup completes
+    await cartResponsePromise;
 
-    // Add a product to cart — need to refresh page after signup to load cart
-    await page.reload();
+    // Cart should be visible and empty
+    await expect(page.locator("text=Cart is empty")).toBeVisible();
 
-    // Click first "Add to cart" button
+    // Add a product to cart
+    const addResponsePromise = page.waitForResponse(
+      (res) =>
+        res.url().includes("/api/cart") &&
+        res.request().method() === "POST" &&
+        res.status() === 200,
+    );
+
     await page.locator("button", { hasText: "Add to cart" }).first().click();
 
-    // Wait a moment for the API call and cart refresh
-    await page.waitForTimeout(1000);
+    // Wait for the POST to complete, then for the subsequent GET that refreshes the cart
+    await addResponsePromise;
+    await page.waitForResponse(
+      (res) =>
+        res.url().includes("/api/cart") &&
+        res.request().method() === "GET" &&
+        res.status() === 200,
+    );
 
-    // Reload — cart should now have an item
-    await page.reload();
-
-    // Cart should show the item
-    await expect(page.locator("text=Remove")).toBeVisible({ timeout: 5000 });
+    // Cart should now show the item
+    await expect(page.locator("text=Remove")).toBeVisible();
     await expect(page.locator("text=Total:")).toBeVisible();
   });
 });

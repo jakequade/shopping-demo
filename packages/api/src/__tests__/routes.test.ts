@@ -207,6 +207,6 @@ describe("Cart validation", () => {
     });
     expect(res.statusCode).toBe(400);
     const body = JSON.parse(res.payload);
-    expect(body.message).toContain("positive integer");
+    expect(body.message).toContain("Number must be greater than 0");
   });
 });

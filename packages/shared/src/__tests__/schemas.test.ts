@@ -8,7 +8,7 @@ import {
   AddToCartInput,
   RemoveFromCartInput,
   formatPrice,
-} from "../schemas.ts";
+} from "../schemas";
 
 const validProduct = {
   id: "550e8400-e29b-41d4-a716-446655440000",
@@ -45,13 +45,21 @@ describe("Product", () => {
   });
 
   it("rejects a product with non-UUID id", () => {
-    expect(() => Product.parse({ ...validProduct, id: "not-a-uuid" })).toThrow();
+    expect(() =>
+      Product.parse({ ...validProduct, id: "not-a-uuid" }),
+    ).toThrow();
   });
 });
 
 describe("Category", () => {
   it("accepts all valid categories", () => {
-    const cats = ["dry-food", "wet-food", "treats", "toys", "healthcare"] as const;
+    const cats = [
+      "dry-food",
+      "wet-food",
+      "treats",
+      "toys",
+      "healthcare",
+    ] as const;
     for (const c of cats) {
       expect(Category.parse(c)).toBe(c);
     }
@@ -168,9 +176,7 @@ describe("AddToCartInput", () => {
   });
 
   it("rejects non-UUID productId", () => {
-    expect(() =>
-      AddToCartInput.parse({ productId: "bad-id" }),
-    ).toThrow();
+    expect(() => AddToCartInput.parse({ productId: "bad-id" })).toThrow();
   });
 });
 
@@ -184,9 +190,7 @@ describe("RemoveFromCartInput", () => {
   });
 
   it("rejects non-UUID productId", () => {
-    expect(() =>
-      RemoveFromCartInput.parse({ productId: "" }),
-    ).toThrow();
+    expect(() => RemoveFromCartInput.parse({ productId: "" })).toThrow();
   });
 });
 

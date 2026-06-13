@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+env:
+  DATABASE_URL: postgres://pc:pc@localhost:5432/pc_interview
+  API_ORIGIN: http://localhost:3001
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pc
+          POSTGRES_PASSWORD: pc
+          POSTGRES_DB: pc_interview
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Run migrations
+        run: bun run db:migrate
+
+      - name: Seed database
+        run: bun run db:seed
+
+      - name: Unit tests — shared
+        run: bun run test:shared
+
+      - name: Unit & integration tests — API
+        run: bun run test:api
+
+      - name: Install Playwright browsers
+        working-directory: packages/web
+        run: bunx playwright install chromium --with-deps
+
+      - name: E2E tests
+        working-directory: packages/web
+        run: bunx playwright test
+        env:
+          DATABASE_URL: postgres://pc:pc@localhost:5432/pc_interview
+          NEXT_PUBLIC_API_ORIGIN: http://localhost:3001

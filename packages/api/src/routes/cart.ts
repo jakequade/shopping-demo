@@ -1,6 +1,7 @@
 import { FastifyPluginAsync } from "fastify";
 import { db, schema } from "../db/index.ts";
-import { Cart, CartItem, Product } from "@pc/shared";
+import { Cart, CartItem, Product, AddToCartInput, RemoveFromCartInput } from "@pc/shared";
+import { ZodError } from "zod";
 import { eq, and } from "drizzle-orm";
 
 const cart: FastifyPluginAsync = async (fastify) => {
@@ -56,18 +57,20 @@ const cart: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    const { productId, quantity } = request.body as {
-      productId: string;
-      quantity?: number;
-    };
-
-    const qty = quantity ?? 1;
-    if (!Number.isInteger(qty) || qty < 1) {
-      return reply.status(400).send({
-        statusCode: 400,
-        error: "Bad Request",
-        message: "quantity must be a positive integer",
-      });
+    let productId: string, qty: number;
+    try {
+      const parsed = AddToCartInput.parse(request.body);
+      productId = parsed.productId;
+      qty = parsed.quantity;
+    } catch (err) {
+      if (err instanceof ZodError) {
+        return reply.status(400).send({
+          statusCode: 400,
+          error: "Bad Request",
+          message: err.errors.map((e) => e.message).join("; "),
+        });
+      }
+      throw err;
     }
 
     const [product] = await db
@@ -123,14 +126,19 @@ const cart: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    const { productId } = request.query as { productId: string };
-
-    if (!productId) {
-      return reply.status(400).send({
-        statusCode: 400,
-        error: "Bad Request",
-        message: "productId query parameter is required",
-      });
+    let productId: string;
+    try {
+      const parsed = RemoveFromCartInput.parse(request.query);
+      productId = parsed.productId;
+    } catch (err) {
+      if (err instanceof ZodError) {
+        return reply.status(400).send({
+          statusCode: 400,
+          error: "Bad Request",
+          message: err.errors.map((e) => e.message).join("; "),
+        });
+      }
+      throw err;
     }
 
     const [existing] = await db
@@ -175,11 +183,19 @@ const cart: FastifyPluginAsync = async (fastify) => {
       quantity: number;
     };
 
-    if (!Number.isInteger(quantity) || quantity < 0) {
+    if (typeof quantity !== "number" || !Number.isInteger(quantity) || quantity < 0) {
       return reply.status(400).send({
         statusCode: 400,
         error: "Bad Request",
         message: "quantity must be a non-negative integer",
+      });
+    }
+
+    if (typeof productId !== "string" || productId.length === 0) {
+      return reply.status(400).send({
+        statusCode: 400,
+        error: "Bad Request",
+        message: "productId is required",
       });
     }
 
