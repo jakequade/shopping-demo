@@ -2,9 +2,9 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: pc
-      POSTGRES_PASSWORD: pc
-      POSTGRES_DB: pc_interview
+      POSTGRES_USER: ${POSTGRES_USER:-pc}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pc}
+      POSTGRES_DB: ${POSTGRES_DB:-pc_interview}
     ports:
       - "5432:5432"
     volumes:

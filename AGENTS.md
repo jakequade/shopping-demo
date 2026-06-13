@@ -93,7 +93,7 @@ Tailwind 4 + daisyUI 5. Theme set to `"lofi"` on the `<html>` element. `globals.
 ## Gotchas
 
 - `bun run test` from root does nothing — must `cd` into each package
-- Docker compose uses `pc:pc` credentials and `pc_interview` database — hardcoded in `docker-compose.yml` and the fallback `DATABASE_URL` in `db/index.ts` and `drizzle.config.ts`
+- Docker compose defaults to `pc:pc` credentials and `pc_interview` database — override via `.env` (see `.env.example`)
 - `.env` is gitignored — `app.ts` imports `dotenv/config` so a `.env` file is loaded if present
 - `packages/api/drizzle/` contains migration SQL and metadata — Drizzle generates these; manually editing them will break the migration chain
 - The web package has `vitest.config.ts` but no unit tests written yet — only Playwright e2e tests exist

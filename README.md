@@ -14,7 +14,7 @@ Monorepo with Bun workspaces for a pet e-commerce technical interview.
 ## Quick start
 
 ```bash
-# 1. Start Postgres
+# 1. Start Postgres (default: user=pc, password=pc, db=pc_interview)
 docker compose up -d
 
 # 2. Install dependencies
@@ -34,6 +34,8 @@ bun run dev
 # 6. In another terminal, start the frontend (port 3000)
 cd packages/web && bun run dev
 ```
+
+Override credentials by creating `.env` from `.env.example` — Docker Compose and the API both read from environment variables.
 
 Open http://localhost:3000 — sign in with a name (optional), then add products to cart.
 
