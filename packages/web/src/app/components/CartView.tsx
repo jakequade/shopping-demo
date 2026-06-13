@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Cart, formatPrice } from "@pc/shared";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Cart, formatPrice, SignupInput, type SignupInput as SignupInputType } from "@pc/shared";
 import { getCart, removeFromCart, signup } from "../actions";
 
 export function CartView() {
@@ -131,36 +133,47 @@ export function CartView() {
 }
 
 function SignupForm({ onSignup: onSignupCb }: { onSignup: (id: string) => void }) {
-  const [name, setName] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupInputType>({
+    resolver: zodResolver(SignupInput),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const onSubmit = async (data: SignupInputType) => {
     try {
-      const data = await signup(name || undefined);
-      localStorage.setItem("userId", data.userId);
-      onSignupCb(data.userId);
+      const result = await signup(data.name || undefined);
+      localStorage.setItem("userId", result.userId);
+      onSignupCb(result.userId);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Signup failed");
+      setError("root", {
+        message: e instanceof Error ? e.message : "Signup failed",
+      });
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {error && <p className="text-error text-sm mb-2">{error}</p>}
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {errors.root && (
+        <p className="text-error text-sm mb-2">{errors.root.message}</p>
+      )}
       <p className="text-sm text-base-content/60 mb-2">
         Sign in to start shopping
       </p>
       <div className="flex gap-2">
         <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          {...register("name")}
           placeholder="Your name (optional)"
           className="input input-bordered input-sm flex-1"
         />
-        <button type="submit" className="btn btn-primary btn-sm">
-          Sign in
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="btn btn-primary btn-sm"
+        >
+          {isSubmitting ? "Signing in..." : "Sign in"}
         </button>
       </div>
     </form>

@@ -1,14 +1,33 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Cart } from "@pc/shared";
 import { getCart, addToCartItem, setCartQuantity } from "../actions";
 
+const QuantityFormSchema = z.object({
+  quantity: z.coerce.number().int().nonnegative(),
+});
+
+type QuantityForm = z.infer<typeof QuantityFormSchema>;
+
 export function AddToCartButton({ productId }: { productId: string }) {
   const [quantity, setQuantity] = useState<number | null>(null);
-  const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const {
+    register,
+    setValue,
+    trigger,
+    getValues,
+    formState: { errors },
+  } = useForm<QuantityForm>({
+    resolver: zodResolver(QuantityFormSchema),
+    defaultValues: { quantity: 0 },
+  });
 
   const userId =
     typeof window !== "undefined" ? localStorage.getItem("userId") : null;
@@ -17,7 +36,6 @@ export function AddToCartButton({ productId }: { productId: string }) {
     const uid = localStorage.getItem("userId");
     if (!uid) {
       setQuantity(null);
-      setInputValue("");
       return;
     }
     try {
@@ -25,11 +43,11 @@ export function AddToCartButton({ productId }: { productId: string }) {
       const item = cart.items.find((i) => i.product.id === productId);
       const q = item ? item.quantity : null;
       setQuantity(q);
-      setInputValue(q !== null ? String(q) : "");
+      if (q !== null) setValue("quantity", q);
     } catch {
       // silent
     }
-  }, [productId]);
+  }, [productId, setValue]);
 
   useEffect(() => {
     fetchCartQuantity();
@@ -56,7 +74,7 @@ export function AddToCartButton({ productId }: { productId: string }) {
     try {
       await addToCartItem(productId, uid, 1);
       setQuantity(1);
-      setInputValue("1");
+      setValue("quantity", 1);
       notifyCartUpdated();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to add to cart");
@@ -74,10 +92,9 @@ export function AddToCartButton({ productId }: { productId: string }) {
       await setCartQuantity(productId, newQty, uid);
       if (newQty === 0) {
         setQuantity(null);
-        setInputValue("");
       } else {
         setQuantity(newQty);
-        setInputValue(String(newQty));
+        setValue("quantity", newQty);
       }
       notifyCartUpdated();
     } catch (e) {
@@ -87,14 +104,12 @@ export function AddToCartButton({ productId }: { productId: string }) {
     }
   };
 
-  const commitInput = () => {
-    const parsed = parseInt(inputValue, 10);
-    if (!isNaN(parsed) && parsed >= 0) {
-      if (parsed === (quantity ?? 0)) return;
-      handleSetQuantity(parsed);
-    } else {
-      setInputValue(quantity !== null ? String(quantity) : "");
-    }
+  const commitInput = async () => {
+    const valid = await trigger("quantity");
+    if (!valid) return;
+    const val = getValues("quantity");
+    if (val === quantity) return;
+    handleSetQuantity(val);
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent) => {
@@ -119,6 +134,8 @@ export function AddToCartButton({ productId }: { productId: string }) {
     );
   }
 
+  const quantityRegister = register("quantity", { valueAsNumber: true });
+
   return (
     <div>
       <div className="flex items-center gap-1">
@@ -133,9 +150,13 @@ export function AddToCartButton({ productId }: { productId: string }) {
         </button>
         <input
           type="number"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onBlur={commitInput}
+          name={quantityRegister.name}
+          ref={quantityRegister.ref}
+          onChange={quantityRegister.onChange}
+          onBlur={(e) => {
+            quantityRegister.onBlur(e);
+            commitInput();
+          }}
           onKeyDown={handleInputKeyDown}
           min={0}
           className="input input-bordered input-sm w-16 text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -151,6 +172,9 @@ export function AddToCartButton({ productId }: { productId: string }) {
           +
         </button>
       </div>
+      {errors.quantity && (
+        <p className="text-error text-xs mt-1">{errors.quantity.message}</p>
+      )}
       {error && <p className="text-error text-xs mt-1">{error}</p>}
     </div>
   );

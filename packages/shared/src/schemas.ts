@@ -54,6 +54,12 @@ export const RemoveFromCartInput = z.object({
 });
 export type RemoveFromCartInput = z.infer<typeof RemoveFromCartInput>;
 
+// ── Signup ────────────────────────────────────────────
+export const SignupInput = z.object({
+  name: z.string().optional(),
+});
+export type SignupInput = z.infer<typeof SignupInput>;
+
 // ── Helpers ───────────────────────────────────────────
 export function formatPrice(cents: number): string {
   const dollars = cents / 100;
